@@ -24,15 +24,14 @@ def write_polar_gcode_to_txt(filename: str, gcode_array: list[tuple], make_relat
                 phi = gcode_array[i][1] - gcode_array[i - 1][1]
 
                 if i == 0:
-                    f.write(str(round(value[0])) + ' ' + str(round(value[1])) + '\n')
+                    f.write(str(round(value[0])) + ' ' + str(round(value[1])))
                 else:
                     if abs(phi) > 180:
                         if phi < 0:  # clockwise direction
                             phi = 360 - abs(phi)
                         else:
                             phi = -(360 - abs(phi))
-                    f.write(str(round(r, 2)) + ' ' +
-                            str(round(phi, 2)) + '\n')
+                    f.write('\n'+str(round(r, 2)) + ' ' + str(round(phi, 2))) # stupid WA to avoid blank line at the end
     else:
         with open(filename, 'w+') as f:
             for i in gcode_array:
@@ -40,5 +39,16 @@ def write_polar_gcode_to_txt(filename: str, gcode_array: list[tuple], make_relat
 
 
 if __name__ == '__main__':
+    import svg_parser, bezier
+    from pygame.math import Vector2
+    discretization_step = 20 # higher step - more accurate path
+
+    my_bezier_raw = svg_parser.parce_xml('Figure.svg', True)  # array of bezies
+    general_bezier = bezier.RegularBezier.from_array(my_bezier_raw[0])
+    cubic_bezier_sequence = general_bezier.to_cubic_bezier()
+
+    for i in cubic_bezier_sequence:
+        i.to_linear_decart(20)
+
     test_gcode = ([6, 170], [7, -170], [7, -130], [6, -175], [4, 175])
-    write_polar_gcode_to_txt("test.txt", test_gcode, True)
+    write_polar_gcode_to_txt("test.txt", cubic_bezier_sequence[0].to_polar_coord(Vector2(400,400)), True)

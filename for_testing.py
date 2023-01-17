@@ -1,20 +1,6 @@
-from math import atan2, degrees, pi
-import pygame
+from pygame.math import Vector2
 
-test_vector = pygame.math.Vector2(10,0)
-test_vector.rotate(45)
-
-x1=0
-x2=10
-y1 =0
-y2 =20
-
-dx = x2 - x1
-dy = y2 - y1
-rads = atan2(-dy,dx)
-rads %= 2*pi
-degs = degrees(rads)
-print(sign(-5))
-
-with open('test.txt', 'w+') as f:
-    f.write('Hi')
+vec = Vector2()
+# This updates the cartesian coordinates of vec.
+vec.from_polar((90, 90))  # 90 pixels long, rotated 60 degrees.
+print(vec)
