@@ -14,7 +14,7 @@ dy = y2 - y1
 rads = atan2(-dy,dx)
 rads %= 2*pi
 degs = degrees(rads)
-print(degs)
+print(sign(-5))
 
 with open('test.txt', 'w+') as f:
     f.write('Hi')
