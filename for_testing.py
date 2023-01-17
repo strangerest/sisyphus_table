@@ -16,4 +16,5 @@ rads %= 2*pi
 degs = degrees(rads)
 print(degs)
 
-def get_distance
+with open('test.txt', 'w+') as f:
+    f.write('Hi')

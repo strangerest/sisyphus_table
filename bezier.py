@@ -5,7 +5,7 @@ import numpy as np
 
 class CubicBezier:
     """
-    cubic_bezier contains 4 control nodes (pygame.math.Vector2) stored in .bezier array
+    self contains 4 control nodes (pygame.math.Vector2) stored in .bezier array
     to create object use classmethod from_vector or from_array
     to access interpolated bezier curve version call to_linear_decart method.
     the result will be stored in linear_decart_array and returned as well
@@ -30,6 +30,7 @@ class CubicBezier:
 
     def __init__(self, four_node_vector_array):
         self.bezier = four_node_vector_array
+        self.linear_decart_array = []
 
     def __repr__(self):
         return '<Cubic_bezier{}>'.format(len(self.bezier))
@@ -55,6 +56,20 @@ class CubicBezier:
         linear_path.append(self.lerp(1))
         self.linear_decart_array = linear_path
         return linear_path
+
+    def to_polar_coord(self, origin: pygame.math.Vector2):
+        """
+        function returns a list of tuples (r, phi) of polar coordinates
+        origin should be a Vector2 in same decartes coordinate system
+        """
+        if len(self.linear_decart_array) == 0:
+            self.to_linear_decart(20)
+
+        gcode_list = list()
+        for i in self.linear_decart_array:
+            r_phi = (i - origin).as_polar()
+            gcode_list.append(r_phi)
+        return gcode_list
 
     # drawing functions
     def draw_points(self, surface: pygame.Surface, radius):
