@@ -42,7 +42,7 @@ iter =0
 while True:
     servise_func()
 
-    # svg bezier
+    # svg bezier_raw
     cubic_bezier_sequence[0].draw_bezier(SCREEN)
     cubic_bezier_sequence[0].draw_points(SCREEN, 2)
     screen_rect = SCREEN.get_rect()
