@@ -1,12 +1,15 @@
 from pygame.math import Vector2
 
-vec = Vector2()
-# This updates the cartesian coordinates of vec.
-vec.from_polar((90, 90))  # 90 pixels long, rotated 60 degrees.
-print(vec)
+
+class BasicParent:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def return_sum(vec2: Vector2 = Vector2(0, 0), vec1: Vector2 = Vector2(0, 0)):
+        return vec1 + vec2
 
 
-def test_func():
-    return 10,20
-a,b=test_func()
-print(b)
+myObj = BasicParent()
+print(Vector2(10, 20) + Vector2(30, 40))
+print(myObj.return_sum(Vector2(10, 20), Vector2(30, 40)))

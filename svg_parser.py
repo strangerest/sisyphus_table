@@ -1,4 +1,4 @@
-# this module is looking for bezier_raw object in svg file (xml representation)
+# this module is looking for regular_bezier_raw object in svg file (xml representation)
 # element we need called "path"
 # additionally we have "xmlns" attribute which defines namespace for all elements including "path"
 #  example of "path": <path class="fil0 str0" d="M0.98 3.68c4652.25,1242.55 5742.15,9509.38 9991.86,9991.86"/>
@@ -8,8 +8,8 @@ import xml.etree.ElementTree as ET
 def parce_xml(filename, make_nodes_absolute: bool = False, round_to: int = 0) -> list[list]:
     """
     function will return list of lists representing x y coordinates
-    of bezier_raw curves, rounding it (whole number by default)
-    Important!!! bezier_raw coordinates are relative to first node
+    of regular_bezier_raw curves, rounding it (whole number by default)
+    Important!!! regular_bezier_raw coordinates are relative to first node
     to make it absolute use make_absolute_flag
     """
     tree = ET.parse(filename)
@@ -17,7 +17,7 @@ def parce_xml(filename, make_nodes_absolute: bool = False, round_to: int = 0) ->
     # parse namespace
     svg_namespace = str(root.tag)
     svg_namespace = '{' + svg_namespace[svg_namespace.find("{") + 1:svg_namespace.find("}")] + '}'
-    # get bezier_raw coordinates
+    # get regular_bezier_raw coordinates
 
     bezier_raw = list()
     for path in root.iter(svg_namespace + 'path'):
