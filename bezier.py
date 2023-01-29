@@ -16,8 +16,8 @@ class CubicBezier:
     the result will be stored in linear_decart_array and returned as well
     """
     # public variables
-    bezier_raw = []
-    linear_decart_array = []
+    bezier_raw = list()
+    linear_decart_array = list()
     polar_array = list()
 
     # init functions
@@ -106,10 +106,13 @@ class CubicBezier:
         for i in self.linear_decart_array:
             pygame.draw.circle(surface, Color('red'), i, radius)
 
-    def draw_bezier(self, surface: pygame.Surface):
-        pygame.gfxdraw.bezier(surface, self.bezier_raw, 10, Color('red'))
+    def draw_bezier(self, surface: pygame.Surface, segment_amount: int = 10):
+        pygame.gfxdraw.bezier(surface, self.bezier_raw, segment_amount, Color('red'))
 
     # service functions
+    def reset_decart_polar(self):
+        self.linear_decart_array = list()
+        self.polar_array = list()
     @staticmethod
     def divide_chunks_2vect(divided_list, n, starting_element):
         for i in range(starting_element, len(divided_list), n):
@@ -121,30 +124,42 @@ class RegularBezier:
     cubic_bezier_list = list()  # list of cubic_bezier class objects made from regular bezier division
     regular_bezier_raw = list()  # list of vector2 objects represent nodes of regular bezier
     linear_decart_array = list()
+    polar_array = list()
 
     # init functions
-    def __init__(self, vector_array: list[Vector2]):
+    def __init__(self, vector_array: list[Vector2], calculate_decart_points: bool = True,
+                 segment_amount: int = 10, calculate_polar_points: bool = True, polar_origin: Vector2 = Vector2(0, 0)):
         """
         appropriate way to use constructor is through classmethods below: .from_vector and .from_array
         :param vector_array:
         """
         self.regular_bezier_raw = vector_array
+        if calculate_decart_points:
+            self.to_linear_decart(segment_amount)
+        if calculate_decart_points:
+            if not calculate_decart_points:
+                self.to_linear_decart(segment_amount)
+            self.to_polar_coord(polar_origin)
 
     @classmethod
-    def from_vector(cls, vector_array: list[Vector2]):
+    def from_vector(cls, vector_array: list[Vector2], calculate_decart_points: bool = True,
+                    segment_amount: int = 10, calculate_polar_points: bool = True, polar_origin: Vector2 = Vector2(0, 0)):
         if (len(vector_array) - 4) % 3 == 0 and isinstance(vector_array[0], pygame.math.Vector2):
-            return cls(vector_array)
+            return cls(vector_array, calculate_decart_points,
+                       segment_amount, calculate_polar_points, polar_origin)
         else:
             raise Exception(
                 "Regular regular_bezier_raw defines by array of pygame.math.Vector2"
                 " It could contain 4 7 10 13 16 and so ode nodes")
 
     @classmethod
-    def from_array(cls, regular_number_array: list[float, int]):
+    def from_array(cls, regular_number_array: list[float, int], calculate_decart_points: bool = True,
+                   segment_amount: int = 10, calculate_polar_points: bool = True, polar_origin: Vector2 = Vector2(0, 0)):
 
         if (len(regular_number_array) - 8) % 3 == 0:
             regular_bezier = list(cls.divide_chunks_2vect(regular_number_array, 2, 0))
-            return cls(regular_bezier)
+            return cls(regular_bezier, calculate_decart_points,
+                       segment_amount, calculate_polar_points, polar_origin)
         else:
             raise Exception("Cubic regular_bezier_raw defines by array of 8 float/int numbers")
 
@@ -172,9 +187,8 @@ class RegularBezier:
         :return:
         """
 
-        if not self.cubic_bezier_list:
-            self.to_cubic_bezier()
-
+        self.reset_decart_polar()
+        self.to_cubic_bezier()
         for i in self.cubic_bezier_list:
             self.linear_decart_array.extend(i.to_linear_decart(discrete_step))
             self.linear_decart_array.pop()
@@ -184,10 +198,26 @@ class RegularBezier:
     def to_polar_coord(self, origin: pygame.math.Vector2 = pygame.math.Vector2(0, 0)):
         if not self.linear_decart_array:
             self.to_linear_decart()
+
         for i in self.linear_decart_array:
-            pass
+            r_phi = (i - origin).as_polar()
+            self.polar_array.append(r_phi)
+        return self.polar_array
+
+        # drawing functions
+
+    def draw_points(self, surface: pygame.Surface, radius: int = 2):
+        for i in self.linear_decart_array:
+            pygame.draw.circle(surface, Color('red'), i, radius)
+
+    def draw_bezier(self, display_surface: pygame.Surface, segment_amount=10):
+        for i in self.cubic_bezier_list:
+            pygame.gfxdraw.bezier(display_surface, i.bezier_raw, segment_amount, Color('BLUE'))
 
     # service functions
+    def reset_decart_polar(self):
+        self.linear_decart_array = list()
+        self.polar_array = list()
     @staticmethod
     def divide_chunks_2vect(divided_list, n, starting_element):
         for i in range(starting_element, len(divided_list), n):
@@ -198,6 +228,22 @@ class RegularBezier:
         # looping till length l
         for i in range(starting_element, len(divided_list), n):
             yield divided_list[i:i + n]
+
+
+#  DO WE REALLY NEED IT????
+class RegularBezierSequence:
+    linear_decart_array = list()
+
+    def __init__(self, regular_bezier_array: list[RegularBezier]):
+        """
+        it is a wrapper for regular bezier array so appropriate way to set it is by passing  list[RegularBezier]
+        :param regular_bezier_array:
+        """
+        self.regular_bezier_array = regular_bezier_array
+
+    def to_linear_decart(self, discrete_step: int = 10):
+        for i in self.regular_bezier_array:
+            self.linear_decart_array.extend(i.linear_decart_array)
 
 
 # testing block

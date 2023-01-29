@@ -4,7 +4,7 @@ could write formatted gcode to txt from  array of tuples
 could convert absolute polar coordinates to relative shift
 """
 
-
+# TODO: fix "z" at the end problem
 def write_polar_gcode_to_txt(filename: str, gcode_array: list[tuple], make_relative=False):
     """
     main problem with polar coordinates - brake gap between 180 deg and -180 deg
@@ -39,16 +39,14 @@ def write_polar_gcode_to_txt(filename: str, gcode_array: list[tuple], make_relat
 
 
 if __name__ == '__main__':
-    import svg_parser, bezier
+    import svg_parser
+    from bezier import RegularBezier, CubicBezier
     from pygame.math import Vector2
     discretization_step = 20 # higher step - more accurate path
 
-    my_bezier_raw = svg_parser.parce_xml('Figure.svg', True)  # array of bezies
-    general_bezier = bezier.RegularBezier.from_array(my_bezier_raw[0])
-    cubic_bezier_sequence = general_bezier.to_cubic_bezier()
+    my_bezier_raw = svg_parser.parce_xml('star.svg', True)  # array of bezies
+    general_bezier = RegularBezier.from_array(my_bezier_raw[0])
+    general_bezier.to_polar_coord(Vector2(75,75))
+    print(general_bezier.polar_array)
 
-    for i in cubic_bezier_sequence:
-        i.to_linear_decart(20)
-
-    test_gcode = ([6, 170], [7, -170], [7, -130], [6, -175], [4, 175])
-    write_polar_gcode_to_txt("test.txt", cubic_bezier_sequence[0].to_polar_coord(Vector2(400,400)), True)
+    write_polar_gcode_to_txt("test.txt",general_bezier.polar_array, True)
